@@ -24,7 +24,7 @@ public:
     
     /* ALL FUNCTIONS DECLARED HERE ARE FOR READING FUNCTIONALITY */
     
-    chunkByte* readBytes(long unsigned int size,long unsigned int Offset){
+    chunkByte readBytes(long unsigned int size,long unsigned int Offset){
         lseek(this->Handle,Offset,SEEK_SET);
         
         int* bytesRead = new int[size]; 
@@ -33,14 +33,12 @@ public:
         if(*bytesRead == -1){
             perror("read");
             delete[] bytesRead;
-            
-            return nullptr; // return unsuccessful
         }
         
         chunkByte chunk; //Assinging to a "chunkByte", which gives better memory manipulation when it comes to writing to memory.
-        chunk->bytesRead = bytesRead;
-        chunk->offset = Offset;
-        chunk->size = size;
+        chunk.bytesRead = bytesRead;
+        chunk.offset = Offset;
+        chunk.size = size;
         
         return chunk; // return the streamed, read bytes
     }
@@ -60,9 +58,7 @@ public:
     
     int changeByte(long unsigned int offset,int value){ // Changes a singular byte itself.
         int lsk = lseek(this->Handle,offset,SEEK_SET);
-        if(lsk == -1){
-        return -1;
-        }
+
         int* rd; //write() function only accepts pointers, so we assign a pointer with the value we need.
         *rd = value;
         int w = write(this->Handle,rd,sizeof(int)); 
