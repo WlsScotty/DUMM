@@ -59,9 +59,7 @@ public:
     int changeByte(long unsigned int offset,int value){ // Changes a singular byte itself.
         int lsk = lseek(this->Handle,offset,SEEK_SET);
 
-        int* rd; //write() function only accepts pointers, so we assign a pointer with the value we need.
-        *rd = value;
-        int w = write(this->Handle,rd,sizeof(int)); 
+        int w = write(this->Handle,&value,sizeof(int)); 
         return w;
     }
      
