@@ -1,5 +1,5 @@
 #pragma once
-
+// Program designed to return heap products
 #include <fcntl.h> // Used for future memory manipulation
 #include <thread> // Used for eventual multithreading
 #include <unistd.h> // Used for future libraries in advancing this header
@@ -14,6 +14,7 @@ struct chunkByte{
 }; 
 
 class Process{ // The loaded process is manipulated as a class
+int o = 0;
 public:
     
     ssize_t Handle;
@@ -24,7 +25,7 @@ public:
     
     /* ALL FUNCTIONS DECLARED HERE ARE FOR READING FUNCTIONALITY */
     
-    chunkByte readBytes(long unsigned int size,long unsigned int Offset){
+    chunkByte* readBytes(long unsigned int size,long unsigned int Offset){
         lseek(this->Handle,Offset,SEEK_SET);
         
         int* bytesRead = new int[size]; 
@@ -35,12 +36,13 @@ public:
             delete[] bytesRead;
         }
         
-        chunkByte chunk; //Assinging to a "chunkByte", which gives better memory manipulation when it comes to writing to memory.
-        chunk.bytesRead = bytesRead;
-        chunk.offset = Offset;
-        chunk.size = size;
+        chunkByte *chunk = new chunkByte; //Assinging to a "chunkByte", which gives better memory manipulation when it comes to writing to memory.
+        chunk->bytesRead = bytesRead;
+        chunk->offset = Offset;
+        chunk->size = size;
         
-        return chunk; // return the streamed, read bytes
+        delete[] bytesRead;
+        return *chunk; // return the streamed, read bytes
     }
     
     /* ALL FUNCTIONS BELOW REPRESENT THE WRITING FUNCTIONALITY */
@@ -59,10 +61,20 @@ public:
     int changeByte(long unsigned int offset,int value){ // Changes a singular byte itself.
         int lsk = lseek(this->Handle,offset,SEEK_SET);
 
-        int w = write(this->Handle,&value,sizeof(int)); 
+        int w = write(this->Handle,&value,(sizeof(value))); 
         return w;
     }
-     
+    
+    ssize_t streamBytes(long unsigned int startOffset, long unsigned int endOffset){
+        if(o+startOffset <= endOffset){
+            
+            std::cout << o << "\n";
+            o++;
+            return lseek(this->Handle,startOffset+o,sizeof(int));
+        } 
+        o = 0;
+        return -1;
+    }
 };
 
 
