@@ -31,8 +31,10 @@ public:
 
     /* ALL FUNCTIONS DECLARED HERE ARE FOR READING FUNCTIONALITY */
 
-    chunkByte* readBytes(long unsigned int size, long unsigned int Offset) {
-    lseek(this->Handle, Offset, SEEK_SET);
+    chunkByte* readBytes(long unsigned int offset, long unsigned int size) {
+    if(offset != -1){
+    lseek(this->Handle, offset, SEEK_SET);
+    }
 
     unsigned char* bytes = new unsigned char[size];  // Corrected to use unsigned char*
     ssize_t bytes_read = read(this->Handle, bytes, size);  // Corrected type of bytesRead
@@ -48,7 +50,7 @@ public:
     chunkByte* chunk = new chunkByte;
 
     chunk->bytesRead = (int*)bytes;  // Store bytes read count (not bytes themselves)
-    chunk->offset = Offset;
+    chunk->offset = offset;
     chunk->size = size;
 
     std::cout << bytes_read << " bytes read\n";  // Print the number of bytes read
@@ -62,9 +64,9 @@ public:
   // I wuold reccomend this method as it autonomously manages the offset itself.
     int pushBytes(chunkByte* Byte){
         lseek(this->Handle,Byte->offset,SEEK_SET);
+        std::cout << "\n" << Byte->offset << " " << Byte->bytesRead << " | ";
         int w = write(this->Handle,Byte->bytesRead,Byte->size);
 
-        delete[] Byte;
     return w;
     }
 
@@ -76,7 +78,7 @@ public:
     }
 
     ssize_t streamBytes(long unsigned int startOffset, long unsigned int endOffset){
-        if(o+startOffset <= endOffset){
+        while(o+startOffset != endOffset){
             std::cout << o << "\n";
 
             o++;
